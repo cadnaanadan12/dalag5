@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../models/city.dart';
 import '../models/price_item.dart';
 import '../providers/city_provider.dart';
 import '../providers/language_provider.dart';
@@ -23,6 +22,14 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _navIndex = 0;
+  final _searchController = TextEditingController();
+  String _query = '';
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   void _onNavTap(int index) {
     if (index == _navIndex) return;
@@ -31,18 +38,27 @@ class _HomeScreenState extends State<HomeScreen> {
         setState(() => _navIndex = 0);
         break;
       case 1:
-        Navigator.push(
-            context, MaterialPageRoute(builder: (_) => const MarketsScreen()));
+        Navigator.of(context)
+            .push(MaterialPageRoute(builder: (_) => const MarketsScreen()));
         break;
       case 2:
-        Navigator.push(
-            context, MaterialPageRoute(builder: (_) => const AddPriceScreen()));
+        Navigator.of(context)
+            .push(MaterialPageRoute(builder: (_) => const AddPriceScreen()));
         break;
       case 3:
-        Navigator.push(
-            context, MaterialPageRoute(builder: (_) => const SettingsScreen()));
+        Navigator.of(context)
+            .push(MaterialPageRoute(builder: (_) => const SettingsScreen()));
         break;
     }
+  }
+
+  List<PriceItem> _filter(List<PriceItem> items, bool somali) {
+    if (_query.trim().isEmpty) return items;
+    final q = _query.trim().toLowerCase();
+    return items.where((item) {
+      return item.nameEn.toLowerCase().contains(q) ||
+          item.nameSo.toLowerCase().contains(q);
+    }).toList();
   }
 
   @override
@@ -53,7 +69,9 @@ class _HomeScreenState extends State<HomeScreen> {
     final marketProvider = context.watch<MarketDataProvider>();
     final somali = lang.isSomali;
     final currentCity = cityProvider.currentCity.name;
-    final items = marketProvider.items;
+    final allItems = marketProvider.items;
+    final filteredItems = _filter(allItems, somali);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
       appBar: AppBar(
@@ -65,37 +83,30 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
         actions: [
-          DropdownButton<City>(
-            value: cityProvider.currentCity,
-            underline: const SizedBox(),
-            icon: const Icon(Icons.arrow_drop_down,
-                color: AppColors.primaryGreen),
-            items: availableCities.map((city) {
-              return DropdownMenuItem<City>(
-                value: city,
-                child: Row(
-                  children: [
-                    const Icon(Icons.location_city, size: 16),
-                    const SizedBox(width: 4),
-                    Text(city.name),
-                  ],
-                ),
-              );
-            }).toList(),
-            onChanged: (City? newCity) {
-              if (newCity != null) {
-                cityProvider.setCity(newCity);
-                marketProvider.updateCity(newCity.name);
-              }
-            },
+          Container(
+            margin: const EdgeInsets.only(right: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+              color: isDark ? AppColors.darkChip : AppColors.beige,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.location_city,
+                    size: 16,
+                    color: isDark ? AppColors.darkAccent : AppColors.textDark),
+                const SizedBox(width: 4),
+                Text(currentCity),
+              ],
+            ),
           ),
-          const SizedBox(width: 8),
         ],
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: AppColors.primaryGreen,
-        onPressed: () => Navigator.push(
-            context, MaterialPageRoute(builder: (_) => const AddPriceScreen())),
+        onPressed: () => Navigator.of(context)
+            .push(MaterialPageRoute(builder: (_) => const AddPriceScreen())),
         child: const Icon(Icons.add, color: Colors.white),
       ),
       bottomNavigationBar:
@@ -119,7 +130,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  user.user?.name ?? 'Guest',
+                  user.user?.name ?? lang.t('guest'),
                   style: const TextStyle(
                       color: Colors.white,
                       fontSize: 24,
@@ -166,77 +177,112 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           const SizedBox(height: 18),
+
+          // Search - hadda si dhab ah ayay u shaqaynaysaa
           TextField(
+            controller: _searchController,
+            onChanged: (value) => setState(() => _query = value),
             decoration: InputDecoration(
               prefixIcon: const Icon(Icons.search),
               hintText: lang.t('search_vegetables'),
+              suffixIcon: _query.isNotEmpty
+                  ? IconButton(
+                      icon: const Icon(Icons.close),
+                      onPressed: () {
+                        _searchController.clear();
+                        setState(() => _query = '');
+                      },
+                    )
+                  : null,
             ),
           ),
           const SizedBox(height: 22),
+
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                lang.t('trending_prices'),
+                _query.isEmpty
+                    ? lang.t('trending_prices')
+                    : '${lang.t('search_vegetables')} (${filteredItems.length})',
                 style:
                     const TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
               ),
-              TextButton(
-                onPressed: () => Navigator.push(context,
-                    MaterialPageRoute(builder: (_) => const MarketsScreen())),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(lang.t('view_all'),
-                        style: const TextStyle(color: AppColors.primaryGreen)),
-                    const SizedBox(width: 4),
-                    const Icon(Icons.arrow_forward,
-                        size: 16, color: AppColors.primaryGreen),
-                  ],
+              if (_query.isEmpty)
+                TextButton(
+                  onPressed: () => Navigator.of(context).push(
+                      MaterialPageRoute(builder: (_) => const MarketsScreen())),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(lang.t('view_all'),
+                          style:
+                              const TextStyle(color: AppColors.primaryGreen)),
+                      const SizedBox(width: 4),
+                      const Icon(Icons.arrow_forward,
+                          size: 16, color: AppColors.primaryGreen),
+                    ],
+                  ),
                 ),
-              ),
             ],
           ),
           const SizedBox(height: 10),
-          ...items.take(3).map(
-                (item) => Padding(
-                  padding: const EdgeInsets.only(bottom: 12),
-                  child: TrendingPriceCard(item: item),
+
+          if (filteredItems.isEmpty)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 24),
+              child: Center(
+                child: Text(
+                  lang.isSomali ? 'Wax lama helin' : 'No results found',
+                  style: const TextStyle(color: AppColors.textGrey),
                 ),
               ),
-          const SizedBox(height: 8),
-          Text(
-            lang.t('market_activity'),
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
-          ),
-          const SizedBox(height: 10),
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(14),
-              child: Column(
-                children: [
-                  Row(
-                    children: [
-                      Expanded(
-                          flex: 2,
-                          child: Text(lang.t('item'), style: _headerStyle)),
-                      Expanded(
-                          child: Text(lang.t('unit'), style: _headerStyle)),
-                      Expanded(
-                          child: Text(lang.t('price'), style: _headerStyle)),
-                      Expanded(
-                          child: Text(lang.t('change'),
-                              style: _headerStyle, textAlign: TextAlign.end)),
-                    ],
+            )
+          else
+            ...filteredItems
+                .take(_query.isEmpty ? 3 : filteredItems.length)
+                .map(
+                  (item) => Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: TrendingPriceCard(item: item),
                   ),
-                  const Divider(),
-                  ...items
-                      .take(3)
-                      .map((item) => _activityRow(item, lang, somali)),
-                ],
+                ),
+
+          if (_query.isEmpty) ...[
+            const SizedBox(height: 8),
+            Text(
+              lang.t('market_activity'),
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+            ),
+            const SizedBox(height: 10),
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(14),
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                            flex: 2,
+                            child: Text(lang.t('item'), style: _headerStyle)),
+                        Expanded(
+                            child: Text(lang.t('unit'), style: _headerStyle)),
+                        Expanded(
+                            child: Text(lang.t('price'), style: _headerStyle)),
+                        Expanded(
+                            child: Text(lang.t('change'),
+                                style: _headerStyle, textAlign: TextAlign.end)),
+                      ],
+                    ),
+                    const Divider(),
+                    ...allItems
+                        .take(3)
+                        .map((item) => _activityRow(item, lang, somali)),
+                  ],
+                ),
               ),
             ),
-          ),
+          ],
         ],
       ),
     );
