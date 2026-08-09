@@ -38,6 +38,14 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
+  void _goHome(UserProfile user) {
+    context.read<UserProvider>().login(user);
+    context.read<CityProvider>().setCity(availableCities.first);
+    context.read<MarketDataProvider>().updateCity(availableCities.first.name);
+    Navigator.pushReplacement(
+        context, MaterialPageRoute(builder: (_) => const HomeScreen()));
+  }
+
   void _handleLogin() {
     final lang = context.read<LanguageProvider>();
     final username = _usernameController.text.trim();
@@ -50,22 +58,11 @@ class _LoginScreenState extends State<LoginScreen> {
       return;
     }
 
-    final user = UserProfile(
-      username: username,
-      email: 'user@example.com',
-      name: username,
-      city: 'Hargeisa',
-    );
-    context.read<UserProvider>().login(user);
-    // Set default city
-    context.read<CityProvider>().setCity(availableCities.first);
-    // Load market data
-    context.read<MarketDataProvider>().updateCity('Hargeisa');
-
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (_) => const HomeScreen()),
-    );
+    _goHome(UserProfile(
+        username: username,
+        email: '$username@dalag.com',
+        name: username,
+        city: 'Hargeisa'));
   }
 
   void _handleSignUp() {
@@ -78,31 +75,19 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (username.isEmpty || password.isEmpty || email.isEmpty || name.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Please fill all fields')),
+        SnackBar(content: Text(lang.t('fill_all_fields'))),
       );
       return;
     }
     if (password != confirm) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Passwords do not match')),
+        SnackBar(content: Text(lang.t('passwords_not_match'))),
       );
       return;
     }
 
-    final user = UserProfile(
-      username: username,
-      email: email,
-      name: name,
-      city: 'Hargeisa',
-    );
-    context.read<UserProvider>().login(user);
-    context.read<CityProvider>().setCity(availableCities.first);
-    context.read<MarketDataProvider>().updateCity('Hargeisa');
-
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (_) => const HomeScreen()),
-    );
+    _goHome(UserProfile(
+        username: username, email: email, name: name, city: 'Hargeisa'));
   }
 
   @override
@@ -144,10 +129,9 @@ class _LoginScreenState extends State<LoginScreen> {
                       ? lang.t('create_account_title')
                       : lang.t('welcome_back'),
                   style: const TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.w800,
-                    color: AppColors.primaryGreen,
-                  ),
+                      fontSize: 28,
+                      fontWeight: FontWeight.w800,
+                      color: AppColors.primaryGreen),
                 ),
               ),
               const SizedBox(height: 8),
@@ -179,38 +163,32 @@ class _LoginScreenState extends State<LoginScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     if (_isSignUp) ...[
-                      Text(
-                        lang.t('name'),
-                        style: const TextStyle(fontWeight: FontWeight.w600),
-                      ),
+                      Text(lang.t('name'),
+                          style: const TextStyle(fontWeight: FontWeight.w600)),
                       const SizedBox(height: 8),
                       TextField(
                         controller: _nameController,
-                        decoration: const InputDecoration(
-                          hintText: 'Full Name',
-                          prefixIcon: Icon(Icons.person_outline),
+                        decoration: InputDecoration(
+                          hintText: lang.t('full_name'),
+                          prefixIcon: const Icon(Icons.person_outline),
                         ),
                       ),
                       const SizedBox(height: 18),
-                      Text(
-                        lang.t('email'),
-                        style: const TextStyle(fontWeight: FontWeight.w600),
-                      ),
+                      Text(lang.t('email'),
+                          style: const TextStyle(fontWeight: FontWeight.w600)),
                       const SizedBox(height: 8),
                       TextField(
                         controller: _emailController,
                         keyboardType: TextInputType.emailAddress,
-                        decoration: const InputDecoration(
-                          hintText: 'you@example.com',
-                          prefixIcon: Icon(Icons.email_outlined),
+                        decoration: InputDecoration(
+                          hintText: lang.t('email_hint'),
+                          prefixIcon: const Icon(Icons.email_outlined),
                         ),
                       ),
                       const SizedBox(height: 18),
                     ],
-                    Text(
-                      lang.t('username'),
-                      style: const TextStyle(fontWeight: FontWeight.w600),
-                    ),
+                    Text(lang.t('username'),
+                        style: const TextStyle(fontWeight: FontWeight.w600)),
                     const SizedBox(height: 8),
                     TextField(
                       controller: _usernameController,
@@ -223,19 +201,17 @@ class _LoginScreenState extends State<LoginScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          lang.t('password'),
-                          style: const TextStyle(fontWeight: FontWeight.w600),
-                        ),
+                        Text(lang.t('password'),
+                            style:
+                                const TextStyle(fontWeight: FontWeight.w600)),
                         if (!_isSignUp)
                           GestureDetector(
                             onTap: () {},
                             child: Text(
                               lang.t('forgot_password'),
                               style: const TextStyle(
-                                color: AppColors.primaryGreen,
-                                fontWeight: FontWeight.w600,
-                              ),
+                                  color: AppColors.primaryGreen,
+                                  fontWeight: FontWeight.w600),
                             ),
                           ),
                       ],
@@ -257,10 +233,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     if (_isSignUp) ...[
                       const SizedBox(height: 18),
-                      Text(
-                        lang.t('confirm_password'),
-                        style: const TextStyle(fontWeight: FontWeight.w600),
-                      ),
+                      Text(lang.t('confirm_password'),
+                          style: const TextStyle(fontWeight: FontWeight.w600)),
                       const SizedBox(height: 8),
                       TextField(
                         controller: _confirmPasswordController,
@@ -287,9 +261,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             onChanged: (v) =>
                                 setState(() => _staySignedIn = v ?? false),
                           ),
-                          Expanded(
-                            child: Text(lang.t('stay_signed_in')),
-                          ),
+                          Expanded(child: Text(lang.t('stay_signed_in'))),
                         ],
                       ),
                     ],
@@ -319,11 +291,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     const SizedBox(height: 16),
                     Center(
-                      child: Text(
-                        _isSignUp
-                            ? lang.t('already_have_account')
-                            : lang.t('new_to_dalag'),
-                      ),
+                      child: Text(_isSignUp
+                          ? lang.t('already_have_account')
+                          : lang.t('new_to_dalag')),
                     ),
                     const SizedBox(height: 12),
                     OutlinedButton(
@@ -346,10 +316,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     Text(
                       lang.t('secure_access'),
                       style: const TextStyle(
-                        color: AppColors.textGrey,
-                        fontSize: 11,
-                        letterSpacing: 0.6,
-                      ),
+                          color: AppColors.textGrey,
+                          fontSize: 11,
+                          letterSpacing: 0.6),
                     ),
                   ],
                 ),
