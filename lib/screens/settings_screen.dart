@@ -24,8 +24,7 @@ class SettingsScreen extends StatelessWidget {
 
   void _onNavTap(BuildContext context, int index) {
     if (index == 3) return;
-    Navigator.pushReplacement(
-      context,
+    Navigator.of(context).pushReplacement(
       MaterialPageRoute(
         builder: (_) {
           switch (index) {
@@ -44,10 +43,6 @@ class SettingsScreen extends StatelessWidget {
   void _showLanguageSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
-      backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
       builder: (sheetContext) {
         return Consumer<LanguageProvider>(
           builder: (context, lang, _) => Padding(
@@ -83,35 +78,34 @@ class SettingsScreen extends StatelessWidget {
   }
 
   void _showCityPreferencesSheet(BuildContext context) {
-    final cityProvider = context.read<CityProvider>();
     showModalBottomSheet(
       context: context,
-      backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
       builder: (sheetContext) {
-        return Consumer<CityProvider>(
-          builder: (context, city, _) {
+        return Consumer2<LanguageProvider, CityProvider>(
+          builder: (context, lang, cityProvider, _) {
             return Padding(
               padding: const EdgeInsets.all(20),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text('Select Preferred Cities',
-                      style: const TextStyle(
-                          fontSize: 18, fontWeight: FontWeight.w700)),
+                  Text(
+                    lang.t('select_preferred_city'),
+                    style: const TextStyle(
+                        fontSize: 18, fontWeight: FontWeight.w700),
+                  ),
                   const SizedBox(height: 16),
                   ...availableCities.map((c) {
-                    return CheckboxListTile(
-                      value: city.currentCity.id == c.id,
+                    return RadioListTile<String>(
+                      value: c.id,
+                      groupValue: cityProvider.currentCity.id,
+                      activeColor: AppColors.primaryGreen,
+                      title: Text(c.name),
                       onChanged: (_) {
-                        city.setCity(c);
+                        cityProvider.setCity(c);
                         Navigator.pop(context);
                       },
-                      title: Text(c.name),
                     );
-                  }).toList(),
+                  }),
                 ],
               ),
             );
@@ -143,14 +137,13 @@ class SettingsScreen extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
         children: [
-          // Profile card
           GestureDetector(
             onTap: () => Navigator.push(context,
                 MaterialPageRoute(builder: (_) => const ProfileEditScreen())),
             child: Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: Theme.of(context).cardTheme.color,
                 borderRadius: BorderRadius.circular(18),
                 boxShadow: [
                   BoxShadow(
@@ -196,12 +189,12 @@ class SettingsScreen extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          user.user?.name ?? 'Guest',
+                          user.user?.name ?? lang.t('guest'),
                           style: const TextStyle(
                               fontSize: 18, fontWeight: FontWeight.w700),
                         ),
                         Text(
-                          user.user?.city ?? 'Hargeisa, Somaliland',
+                          user.user?.city ?? 'Hargeisa',
                           style: const TextStyle(color: AppColors.textGrey),
                         ),
                       ],
@@ -213,7 +206,6 @@ class SettingsScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 22),
-          // Preferences
           Text(
             lang.t('preferences'),
             style: const TextStyle(
@@ -226,12 +218,13 @@ class SettingsScreen extends StatelessWidget {
           const SizedBox(height: 10),
           Container(
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: Theme.of(context).cardTheme.color,
               borderRadius: BorderRadius.circular(16),
             ),
             child: Column(
               children: [
                 _settingsTile(
+                  context,
                   icon: Icons.notifications_outlined,
                   title: lang.t('notification_settings'),
                   subtitle: lang.t('notification_sub'),
@@ -244,6 +237,7 @@ class SettingsScreen extends StatelessWidget {
                 ),
                 const Divider(height: 1, indent: 60),
                 _settingsTile(
+                  context,
                   icon: Icons.translate,
                   title: lang.t('language'),
                   subtitle: lang.t('language_sub'),
@@ -252,6 +246,7 @@ class SettingsScreen extends StatelessWidget {
                 ),
                 const Divider(height: 1, indent: 60),
                 _settingsTile(
+                  context,
                   icon: Icons.map_outlined,
                   title: lang.t('city_preferences'),
                   subtitle: lang.t('city_pref_sub'),
@@ -259,9 +254,12 @@ class SettingsScreen extends StatelessWidget {
                 ),
                 const Divider(height: 1, indent: 60),
                 _settingsTile(
+                  context,
                   icon: theme.isDark ? Icons.light_mode : Icons.dark_mode,
                   title: lang.t('dark_mode'),
-                  subtitle: theme.isDark ? 'Dark' : 'Light',
+                  subtitle: theme.isDark
+                      ? lang.t('dark_mode_on')
+                      : lang.t('dark_mode_off'),
                   trailing: Switch(
                     value: theme.isDark,
                     onChanged: (_) => theme.toggleTheme(),
@@ -273,7 +271,6 @@ class SettingsScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 22),
-          // Support
           Text(
             lang.t('support'),
             style: const TextStyle(
@@ -286,12 +283,13 @@ class SettingsScreen extends StatelessWidget {
           const SizedBox(height: 10),
           Container(
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: Theme.of(context).cardTheme.color,
               borderRadius: BorderRadius.circular(16),
             ),
             child: Column(
               children: [
                 _settingsTile(
+                  context,
                   icon: Icons.help_outline,
                   title: lang.t('help_support'),
                   subtitle: lang.t('help_sub'),
@@ -302,6 +300,7 @@ class SettingsScreen extends StatelessWidget {
                 ),
                 const Divider(height: 1, indent: 60),
                 _settingsTile(
+                  context,
                   icon: Icons.privacy_tip_outlined,
                   title: lang.t('privacy_policy'),
                   subtitle: lang.t('privacy_sub'),
@@ -323,8 +322,7 @@ class SettingsScreen extends StatelessWidget {
             label: Text(lang.t('logout')),
             onPressed: () {
               context.read<UserProvider>().logout();
-              Navigator.pushAndRemoveUntil(
-                context,
+              Navigator.of(context).pushAndRemoveUntil(
                 MaterialPageRoute(builder: (_) => const LoginScreen()),
                 (route) => false,
               );
@@ -342,7 +340,8 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  Widget _settingsTile({
+  Widget _settingsTile(
+    BuildContext context, {
     required IconData icon,
     required String title,
     required String subtitle,
