@@ -2,11 +2,8 @@ import '../models/price_item.dart';
 
 class MarketDataService {
   static List<PriceItem> getDataForCity(String cityName) {
-    // Generate dummy data per city
-    // For demo, we vary prices slightly per city
     final baseItems = _baseItems;
     return baseItems.map((item) {
-      // Vary price and change based on city
       double priceFactor = 1.0;
       if (cityName == 'Burco')
         priceFactor = 0.9;
@@ -17,7 +14,6 @@ class MarketDataService {
       else if (cityName == 'Gebiley')
         priceFactor = 0.95;
       else if (cityName == 'Boorama') priceFactor = 1.05;
-      // random change
       double change =
           (item.changePercent * (0.8 + 0.4 * (cityName.hashCode % 5) / 5));
       return PriceItem(
@@ -37,6 +33,7 @@ class MarketDataService {
   }
 
   static final List<PriceItem> _baseItems = [
+    // Vegetables
     PriceItem(
       id: 'tomato',
       nameEn: 'Tomatoes',
@@ -75,7 +72,7 @@ class MarketDataService {
     ),
     PriceItem(
       id: 'pepper',
-      nameEn: 'Peppers',
+      nameEn: 'Peppers (Bell)',
       nameSo: 'Basbaas',
       unitEn: 'Bag (S)',
       unitSo: 'Bag (S)',
@@ -97,6 +94,175 @@ class MarketDataService {
       category: Category.vegetables,
       city: 'Hargeisa',
     ),
+    PriceItem(
+      id: 'cabbage',
+      nameEn: 'Cabbage',
+      nameSo: 'Kabash',
+      unitEn: 'Piece',
+      unitSo: 'Xabbad',
+      price: 4.0,
+      changePercent: 1.2,
+      imageAsset: 'assets/images/cabbage.jpg',
+      category: Category.vegetables,
+      city: 'Hargeisa',
+    ),
+    PriceItem(
+      id: 'cucumber',
+      nameEn: 'Cucumber',
+      nameSo: 'Qajaar',
+      unitEn: 'Piece',
+      unitSo: 'Xabbad',
+      price: 2.5,
+      changePercent: -0.8,
+      imageAsset: 'assets/images/cucumber.jpg',
+      category: Category.vegetables,
+      city: 'Hargeisa',
+    ),
+    PriceItem(
+      id: 'chili',
+      nameEn: 'Chili Pepper',
+      nameSo: 'Basbaas Dhamme',
+      unitEn: 'Bag (S)',
+      unitSo: 'Bag (S)',
+      price: 15.0,
+      changePercent: 6.0,
+      imageAsset: 'assets/images/chili.jpg',
+      category: Category.vegetables,
+      city: 'Hargeisa',
+    ),
+    PriceItem(
+      id: 'lettuce',
+      nameEn: 'Lettuce',
+      nameSo: 'Salad',
+      unitEn: 'Piece',
+      unitSo: 'Xabbad',
+      price: 3.0,
+      changePercent: 0.5,
+      imageAsset: 'assets/images/lettuce.jpg',
+      category: Category.vegetables,
+      city: 'Hargeisa',
+    ),
+    PriceItem(
+      id: 'spinach',
+      nameEn: 'Spinach',
+      nameSo: 'Isbinaaj',
+      unitEn: 'Bundle',
+      unitSo: 'Xidhmo',
+      price: 3.5,
+      changePercent: -0.2,
+      imageAsset: 'assets/images/spinach.jpg',
+      category: Category.vegetables,
+      city: 'Hargeisa',
+    ),
+    PriceItem(
+      id: 'cilantro',
+      nameEn: 'Coriander (Cilantro)',
+      nameSo: 'Kusbar',
+      unitEn: 'Bundle',
+      unitSo: 'Xidhmo',
+      price: 4.5,
+      changePercent: 2.0,
+      imageAsset: 'assets/images/cilantro.jpg',
+      category: Category.vegetables,
+      city: 'Hargeisa',
+    ),
+    PriceItem(
+      id: 'pumpkin',
+      nameEn: 'Pumpkin',
+      nameSo: 'Booq',
+      unitEn: 'Piece',
+      unitSo: 'Xabbad',
+      price: 10.0,
+      changePercent: -1.5,
+      imageAsset: 'assets/images/pumpkin.jpg',
+      category: Category.vegetables,
+      city: 'Hargeisa',
+    ),
+    PriceItem(
+      id: 'greenbeans',
+      nameEn: 'Green Beans',
+      nameSo: 'Dhiriyar',
+      unitEn: '1kg',
+      unitSo: '1kg',
+      price: 6.0,
+      changePercent: 1.8,
+      imageAsset: 'assets/images/greenbeans.jpg',
+      category: Category.vegetables,
+      city: 'Hargeisa',
+    ),
+    PriceItem(
+      id: 'peas',
+      nameEn: 'Peas',
+      nameSo: 'Biskad',
+      unitEn: '1kg',
+      unitSo: '1kg',
+      price: 7.0,
+      changePercent: 0.0,
+      imageAsset: 'assets/images/peas.jpg',
+      category: Category.vegetables,
+      city: 'Hargeisa',
+    ),
+    PriceItem(
+      id: 'beetroot',
+      nameEn: 'Beetroot',
+      nameSo: 'Beetroot',
+      unitEn: 'Bundle',
+      unitSo: 'Xidhmo',
+      price: 5.0,
+      changePercent: 2.5,
+      imageAsset: 'assets/images/beetroot.jpg',
+      category: Category.vegetables,
+      city: 'Hargeisa',
+    ),
+    PriceItem(
+      id: 'okra',
+      nameEn: 'Okra',
+      nameSo: 'Baamiyo',
+      unitEn: '1kg',
+      unitSo: '1kg',
+      price: 8.0,
+      changePercent: 3.0,
+      imageAsset: 'assets/images/okra.jpg',
+      category: Category.vegetables,
+      city: 'Hargeisa',
+    ),
+    PriceItem(
+      id: 'garlic',
+      nameEn: 'Garlic',
+      nameSo: 'Tuum',
+      unitEn: '1kg',
+      unitSo: '1kg',
+      price: 20.0,
+      changePercent: 4.0,
+      imageAsset: 'assets/images/garlic.jpg',
+      category: Category.vegetables,
+      city: 'Hargeisa',
+    ),
+    PriceItem(
+      id: 'broccoli',
+      nameEn: 'Broccoli',
+      nameSo: 'Broccoli',
+      unitEn: 'Piece',
+      unitSo: 'Xabbad',
+      price: 9.0,
+      changePercent: 1.0,
+      imageAsset: 'assets/images/broccoli.jpg',
+      category: Category.vegetables,
+      city: 'Hargeisa',
+    ),
+    PriceItem(
+      id: 'cauliflower',
+      nameEn: 'Cauliflower',
+      nameSo: 'Cauliflower',
+      unitEn: 'Piece',
+      unitSo: 'Xabbad',
+      price: 8.5,
+      changePercent: 0.5,
+      imageAsset: 'assets/images/cauliflower.jpg',
+      category: Category.vegetables,
+      city: 'Hargeisa',
+    ),
+    // Fruits
     PriceItem(
       id: 'watermelon',
       nameEn: 'Watermelon',
@@ -121,6 +287,7 @@ class MarketDataService {
       category: Category.fruits,
       city: 'Hargeisa',
     ),
+    // Grains
     PriceItem(
       id: 'sorghum',
       nameEn: 'Sorghum',
@@ -134,29 +301,18 @@ class MarketDataService {
       city: 'Hargeisa',
     ),
     PriceItem(
-      id: 'oil',
-      nameEn: 'Cooking Oil',
-      nameSo: 'Saliid',
-      unitEn: '5L',
-      unitSo: '5L',
-      price: 18.0,
-      changePercent: 1.1,
-      imageAsset: 'assets/images/oil.jpg',
-      category: Category.oils,
+      id: 'maize',
+      nameEn: 'Maize (Corn)',
+      nameSo: 'Galley',
+      unitEn: '50kg Sack',
+      unitSo: 'Kiish 50kg',
+      price: 28.0,
+      changePercent: 1.2,
+      imageAsset: 'assets/images/maize.jpg',
+      category: Category.grains,
       city: 'Hargeisa',
     ),
-    PriceItem(
-      id: 'chicken',
-      nameEn: 'Chicken (local)',
-      nameSo: 'Digaag',
-      unitEn: 'Piece',
-      unitSo: 'Xabbad',
-      price: 8.0,
-      changePercent: 0.8,
-      imageAsset: 'assets/images/chicken.jpg',
-      category: Category.poultry,
-      city: 'Hargeisa',
-    ),
+    // Spices
     PriceItem(
       id: 'cumin',
       nameEn: 'Cumin',
@@ -169,5 +325,6 @@ class MarketDataService {
       category: Category.spices,
       city: 'Hargeisa',
     ),
+    // Oils - removed chicken and cooking oil
   ];
 }
