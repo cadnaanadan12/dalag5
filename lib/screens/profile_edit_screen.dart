@@ -5,6 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
 import '../models/user_profile.dart';
+import '../providers/language_provider.dart';
 import '../providers/user_provider.dart';
 import '../theme/app_theme.dart';
 
@@ -55,8 +56,9 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final lang = context.watch<LanguageProvider>();
     return Scaffold(
-      appBar: AppBar(title: const Text('Edit Profile')),
+      appBar: AppBar(title: Text(lang.t('edit_profile'))),
       body: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
@@ -77,6 +79,7 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
                   bottom: 0,
                   right: 0,
                   child: IconButton(
+                    tooltip: lang.t('change_photo'),
                     icon: const Icon(Icons.camera_alt,
                         color: AppColors.primaryGreen),
                     onPressed: _pickImage,
@@ -87,17 +90,17 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
             const SizedBox(height: 20),
             TextField(
               controller: _nameController,
-              decoration: const InputDecoration(labelText: 'Name'),
+              decoration: InputDecoration(labelText: lang.t('name')),
             ),
             const SizedBox(height: 16),
             TextField(
               controller: _cityController,
-              decoration: const InputDecoration(labelText: 'City'),
+              decoration: InputDecoration(labelText: lang.t('city')),
             ),
             const SizedBox(height: 30),
             ElevatedButton(
               onPressed: _save,
-              child: const Text('Save'),
+              child: Text(lang.t('save')),
             ),
           ],
         ),
