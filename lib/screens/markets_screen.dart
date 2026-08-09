@@ -23,6 +23,14 @@ class MarketsScreen extends StatefulWidget {
 
 class _MarketsScreenState extends State<MarketsScreen> {
   Category? _selectedCategory;
+  final _searchController = TextEditingController();
+  String _query = '';
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   void _onNavTap(int index) {
     if (index == 1) return;
@@ -43,6 +51,23 @@ class _MarketsScreenState extends State<MarketsScreen> {
     );
   }
 
+  List<PriceItem> _applyFilters(List<PriceItem> items) {
+    var result = items;
+    if (_selectedCategory != null) {
+      result =
+          result.where((item) => item.category == _selectedCategory).toList();
+    }
+    if (_query.trim().isNotEmpty) {
+      final q = _query.trim().toLowerCase();
+      result = result
+          .where((item) =>
+              item.nameEn.toLowerCase().contains(q) ||
+              item.nameSo.toLowerCase().contains(q))
+          .toList();
+    }
+    return result;
+  }
+
   @override
   Widget build(BuildContext context) {
     final lang = context.watch<LanguageProvider>();
@@ -51,9 +76,8 @@ class _MarketsScreenState extends State<MarketsScreen> {
     final somali = lang.isSomali;
     final currentCity = cityProvider.currentCity.name;
     final allItems = marketProvider.items;
-    final filteredItems = _selectedCategory == null
-        ? allItems
-        : allItems.where((item) => item.category == _selectedCategory).toList();
+    final filteredItems = _applyFilters(allItems);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
       appBar: AppBar(
@@ -81,7 +105,7 @@ class _MarketsScreenState extends State<MarketsScreen> {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                 decoration: BoxDecoration(
-                  color: AppColors.beige,
+                  color: isDark ? AppColors.darkChip : AppColors.beige,
                   borderRadius: BorderRadius.circular(14),
                 ),
                 child:
@@ -90,41 +114,51 @@ class _MarketsScreenState extends State<MarketsScreen> {
             ],
           ),
           const SizedBox(height: 14),
-          // City indicator
           Row(
             children: [
               const Icon(Icons.location_on,
                   size: 16, color: AppColors.primaryGreen),
               const SizedBox(width: 4),
-              Text(
-                currentCity,
-                style:
-                    const TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
-              ),
+              Text(currentCity,
+                  style: const TextStyle(
+                      fontWeight: FontWeight.w600, fontSize: 16)),
               const Spacer(),
               Text(
-                '${filteredItems.length} items',
-                style: const TextStyle(color: AppColors.textGrey, fontSize: 12),
+                '${filteredItems.length} ${lang.t('items_count')}',
+                style: TextStyle(
+                    color: isDark ? AppColors.darkGrey : AppColors.textGrey,
+                    fontSize: 12),
               ),
             ],
           ),
           const SizedBox(height: 12),
-          // Category Filter
           CategoryFilter(
             selectedCategory: _selectedCategory,
             onCategorySelected: (cat) =>
                 setState(() => _selectedCategory = cat),
           ),
           const SizedBox(height: 16),
-          // Search
+
+          // Search - hadda si dhab ah ayay u shaqaynaysaa
           TextField(
+            controller: _searchController,
+            onChanged: (value) => setState(() => _query = value),
             decoration: InputDecoration(
               prefixIcon: const Icon(Icons.search),
               hintText: lang.t('search_vegetables'),
+              suffixIcon: _query.isNotEmpty
+                  ? IconButton(
+                      icon: const Icon(Icons.close),
+                      onPressed: () {
+                        _searchController.clear();
+                        setState(() => _query = '');
+                      },
+                    )
+                  : null,
             ),
           ),
           const SizedBox(height: 16),
-          // List
+
           Card(
             child: Padding(
               padding: const EdgeInsets.all(14),
@@ -140,85 +174,112 @@ class _MarketsScreenState extends State<MarketsScreen> {
                           flex: 2,
                           child: Text(lang.t('unit'), style: _headerStyle)),
                       Expanded(
-                          flex: 2,
-                          child: Text(lang.t('price_slsh'),
-                              style: _headerStyle, textAlign: TextAlign.end)),
+                        flex: 2,
+                        child: Text(lang.t('price_slsh'),
+                            style: _headerStyle, textAlign: TextAlign.end),
+                      ),
                     ],
                   ),
                   const Divider(),
-                  ...filteredItems.map((item) => Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Expanded(
-                              flex: 3,
-                              child: Row(
-                                children: [
-                                  ProduceImage(
-                                    assetPath: item.imageAsset,
-                                    fallbackIcon: item.fallbackIcon,
-                                    size: 40,
-                                    borderRadius: 10,
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(item.nameEn,
-                                            style: const TextStyle(
-                                                fontWeight: FontWeight.w600)),
-                                        Text(
-                                          item.name(somali),
-                                          style: const TextStyle(
-                                              color: AppColors.textGrey,
-                                              fontSize: 12),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Expanded(flex: 2, child: Text(item.unit(somali))),
-                            Expanded(
-                              flex: 2,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: [
-                                  Text(
-                                    item.priceLabel,
-                                    style: const TextStyle(
-                                        color: AppColors.positive,
-                                        fontWeight: FontWeight.w700),
-                                  ),
-                                  Text(
-                                    item.changePercent == 0
-                                        ? lang.t('stable')
-                                        : item.changeLabel,
-                                    style: TextStyle(
-                                      fontSize: 11,
-                                      color: item.isUp
-                                          ? AppColors.negative
-                                          : item.isDown
-                                              ? AppColors.positive
-                                              : AppColors.textGrey,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
+                  if (filteredItems.isEmpty)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 20),
+                      child: Center(
+                        child: Text(
+                          somali ? 'Wax lama helin' : 'No results found',
+                          style: TextStyle(
+                              color: isDark
+                                  ? AppColors.darkGrey
+                                  : AppColors.textGrey),
                         ),
-                      )),
+                      ),
+                    )
+                  else
+                    ...filteredItems.map((item) => Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Expanded(
+                                flex: 3,
+                                child: Row(
+                                  children: [
+                                    ProduceImage(
+                                      assetPath: item.imageAsset,
+                                      fallbackIcon: item.fallbackIcon,
+                                      size: 40,
+                                      borderRadius: 10,
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(item.nameEn,
+                                              style: const TextStyle(
+                                                  fontWeight: FontWeight.w600)),
+                                          Text(
+                                            item.name(somali),
+                                            style: TextStyle(
+                                              color: isDark
+                                                  ? AppColors.darkGrey
+                                                  : AppColors.textGrey,
+                                              fontSize: 12,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Expanded(flex: 2, child: Text(item.unit(somali))),
+                              Expanded(
+                                flex: 2,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                    Text(
+                                      item.priceLabel,
+                                      style: TextStyle(
+                                        color: isDark
+                                            ? AppColors.darkPositive
+                                            : AppColors.positive,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                    Text(
+                                      item.changePercent == 0
+                                          ? lang.t('stable')
+                                          : item.changeLabel,
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        color: item.isUp
+                                            ? (isDark
+                                                ? AppColors.darkNegative
+                                                : AppColors.negative)
+                                            : item.isDown
+                                                ? (isDark
+                                                    ? AppColors.darkPositive
+                                                    : AppColors.positive)
+                                                : (isDark
+                                                    ? AppColors.darkGrey
+                                                    : AppColors.textGrey),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        )),
                 ],
               ),
             ),
           ),
           const SizedBox(height: 18),
-          // Sentiment & Analysis
+
           Container(
             padding: const EdgeInsets.all(18),
             decoration: BoxDecoration(
@@ -247,10 +308,9 @@ class _MarketsScreenState extends State<MarketsScreen> {
                   ),
                   onPressed: () {
                     Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (_) => const AnalysisChartScreen()),
-                    );
+                        context,
+                        MaterialPageRoute(
+                            builder: (_) => const AnalysisChartScreen()));
                   },
                   child: Text(lang.t('view_analysis')),
                 ),
@@ -258,26 +318,32 @@ class _MarketsScreenState extends State<MarketsScreen> {
             ),
           ),
           const SizedBox(height: 18),
-          // Price comparison
+
+          // Price Comparison - hadda way la jaan qaadaan Dark Mode
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: AppColors.beige,
+              color: isDark ? AppColors.darkChip : AppColors.beige,
               borderRadius: BorderRadius.circular(16),
+              border: isDark ? Border.all(color: AppColors.darkBorder) : null,
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   lang.t('price_comparison'),
-                  style: const TextStyle(
-                      fontWeight: FontWeight.w700, fontSize: 12),
+                  style: TextStyle(
+                    fontWeight: FontWeight.w700,
+                    fontSize: 12,
+                    color: isDark ? AppColors.darkText : AppColors.textDark,
+                  ),
                 ),
                 const SizedBox(height: 12),
                 _comparisonRow(
-                    somali ? 'Yaanyo' : 'Tomatoes', '9,200', '8,800'),
+                    somali ? 'Yaanyo' : 'Tomatoes', '9,200', '8,800', isDark),
                 const SizedBox(height: 10),
-                _comparisonRow(somali ? 'Basal' : 'Onions', '6,000', '6,500'),
+                _comparisonRow(
+                    somali ? 'Basal' : 'Onions', '6,000', '6,500', isDark),
               ],
             ),
           ),
@@ -292,27 +358,30 @@ class _MarketsScreenState extends State<MarketsScreen> {
     fontWeight: FontWeight.w600,
   );
 
-  Widget _comparisonRow(String name, String burco, String berbera) {
+  Widget _comparisonRow(
+      String name, String burco, String berbera, bool isDark) {
+    final labelColor = isDark ? AppColors.darkGrey : AppColors.textGrey;
+    final valueColor = isDark ? AppColors.darkText : AppColors.textDark;
     return Row(
       children: [
         Expanded(
-            child: Text(name,
-                style: const TextStyle(fontWeight: FontWeight.w600))),
+          child: Text(name,
+              style: TextStyle(fontWeight: FontWeight.w600, color: valueColor)),
+        ),
         Expanded(
           child: Column(
             children: [
-              const Text('Burco',
-                  style: TextStyle(fontSize: 10, color: AppColors.textGrey)),
-              Text(burco),
+              Text('Burco', style: TextStyle(fontSize: 10, color: labelColor)),
+              Text(burco, style: TextStyle(color: valueColor)),
             ],
           ),
         ),
         Expanded(
           child: Column(
             children: [
-              const Text('Berbera',
-                  style: TextStyle(fontSize: 10, color: AppColors.textGrey)),
-              Text(berbera),
+              Text('Berbera',
+                  style: TextStyle(fontSize: 10, color: labelColor)),
+              Text(berbera, style: TextStyle(color: valueColor)),
             ],
           ),
         ),
