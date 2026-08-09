@@ -25,20 +25,75 @@ class _AddPriceScreenState extends State<AddPriceScreen> {
   String _unit = 'KG';
   final _priceController = TextEditingController();
 
-  final _vegetables = const [
+  final List<(String, String, IconData, Category)> _vegetables = const [
     (
       'TOMATO',
       'assets/images/tomato.jpg',
       Icons.local_florist,
       Category.vegetables
     ),
-    ('BASAL', 'assets/images/onion.jpg', Icons.circle, Category.vegetables),
+    ('ONION', 'assets/images/onion.jpg', Icons.circle, Category.vegetables),
+    ('POTATO', 'assets/images/potato.jpg', Icons.circle, Category.vegetables),
     ('PEPPER', 'assets/images/pepper.jpg', Icons.grain, Category.vegetables),
     ('CARROT', 'assets/images/carrot.jpg', Icons.circle, Category.vegetables),
+    ('CABBAGE', 'assets/images/cabbage.jpg', Icons.circle, Category.vegetables),
+    (
+      'CUCUMBER',
+      'assets/images/cucumber.jpg',
+      Icons.circle,
+      Category.vegetables
+    ),
+    (
+      'CHILI',
+      'assets/images/chili.jpg',
+      Icons.local_fire_department,
+      Category.vegetables
+    ),
+    ('LETTUCE', 'assets/images/lettuce.jpg', Icons.circle, Category.vegetables),
+    ('SPINACH', 'assets/images/spinach.jpg', Icons.circle, Category.vegetables),
+    (
+      'CILANTRO',
+      'assets/images/cilantro.jpg',
+      Icons.circle,
+      Category.vegetables
+    ),
+    ('PUMPKIN', 'assets/images/pumpkin.jpg', Icons.circle, Category.vegetables),
+    (
+      'GREEN BEANS',
+      'assets/images/greenbeans.jpg',
+      Icons.circle,
+      Category.vegetables
+    ),
+    ('PEAS', 'assets/images/peas.jpg', Icons.circle, Category.vegetables),
+    (
+      'BEETROOT',
+      'assets/images/beetroot.jpg',
+      Icons.circle,
+      Category.vegetables
+    ),
+    ('OKRA', 'assets/images/okra.jpg', Icons.circle, Category.vegetables),
+    ('GARLIC', 'assets/images/garlic.jpg', Icons.circle, Category.vegetables),
+    (
+      'BROCCOLI',
+      'assets/images/broccoli.jpg',
+      Icons.circle,
+      Category.vegetables
+    ),
+    (
+      'CAULIFLOWER',
+      'assets/images/cauliflower.jpg',
+      Icons.circle,
+      Category.vegetables
+    ),
+    (
+      'WATERMELON',
+      'assets/images/watermelon.jpg',
+      Icons.circle,
+      Category.fruits
+    ),
     ('MANGO', 'assets/images/mango.jpg', Icons.circle, Category.fruits),
     ('SORGHUM', 'assets/images/sorghum.jpg', Icons.grain, Category.grains),
-    ('OIL', 'assets/images/oil.jpg', Icons.opacity, Category.oils),
-    ('CHICKEN', 'assets/images/chicken.jpg', Icons.egg, Category.poultry),
+    ('MAIZE', 'assets/images/maize.jpg', Icons.grain, Category.grains),
     ('CUMIN', 'assets/images/cumin.jpg', Icons.spa, Category.spices),
   ];
 
@@ -47,8 +102,7 @@ class _AddPriceScreenState extends State<AddPriceScreen> {
 
   void _onNavTap(int index) {
     if (index == 2) return;
-    Navigator.pushReplacement(
-      context,
+    Navigator.of(context).pushReplacement(
       MaterialPageRoute(
         builder: (_) {
           switch (index) {
@@ -69,8 +123,7 @@ class _AddPriceScreenState extends State<AddPriceScreen> {
     final priceStr = _priceController.text.trim();
     if (priceStr.isEmpty || double.tryParse(priceStr) == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text(lang.t('enter_valid_price'))), // need translation
+        SnackBar(content: Text(lang.t('enter_valid_price'))),
       );
       return;
     }
@@ -81,7 +134,7 @@ class _AddPriceScreenState extends State<AddPriceScreen> {
     final newItem = PriceItem(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       nameEn: nameEn,
-      nameSo: nameEn, // simplified
+      nameSo: nameEn,
       unitEn: _unit,
       unitSo: _unit,
       price: price,
@@ -117,15 +170,12 @@ class _AddPriceScreenState extends State<AddPriceScreen> {
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
         children: [
-          Text(
-            lang.t('update_market_price'),
-            style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w800),
-          ),
+          Text(lang.t('update_market_price'),
+              style:
+                  const TextStyle(fontSize: 22, fontWeight: FontWeight.w800)),
           const SizedBox(height: 8),
-          Text(
-            lang.t('add_subtitle'),
-            style: const TextStyle(color: AppColors.textGrey, height: 1.4),
-          ),
+          Text(lang.t('add_subtitle'),
+              style: const TextStyle(color: AppColors.textGrey, height: 1.4)),
           const SizedBox(height: 22),
           Text(
             lang.t('select_vegetable'),
@@ -211,10 +261,9 @@ class _AddPriceScreenState extends State<AddPriceScreen> {
                     Text(
                       lang.t('price_slsh'),
                       style: const TextStyle(
-                        color: AppColors.primaryGreen,
-                        fontWeight: FontWeight.w700,
-                        fontSize: 12,
-                      ),
+                          color: AppColors.primaryGreen,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 12),
                     ),
                     const SizedBox(height: 8),
                     TextField(
@@ -232,13 +281,12 @@ class _AddPriceScreenState extends State<AddPriceScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'UNIT',
-                      style: TextStyle(
-                        color: AppColors.primaryGreen,
-                        fontWeight: FontWeight.w700,
-                        fontSize: 12,
-                      ),
+                    Text(
+                      lang.t('unit').toUpperCase(),
+                      style: const TextStyle(
+                          color: AppColors.primaryGreen,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 12),
                     ),
                     const SizedBox(height: 8),
                     DropdownButtonFormField<String>(
