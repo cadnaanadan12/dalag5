@@ -4,6 +4,9 @@ import 'package:provider/provider.dart';
 import '../providers/language_provider.dart';
 import '../theme/app_theme.dart';
 
+/// Bottom navigation-ka lagu isticmaalo afarta bog ee ugu weyn:
+/// Home, Markets, Add, Settings.
+/// Midabadeeda hadda way la jaan qaadaan Dark Mode / Light Mode.
 class DalagBottomNav extends StatelessWidget {
   final int currentIndex;
   final ValueChanged<int> onTap;
@@ -17,6 +20,16 @@ class DalagBottomNav extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final lang = context.watch<LanguageProvider>();
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final backgroundColor = isDark ? AppColors.darkCard : Colors.white;
+    final selectedChipColor = isDark ? AppColors.darkChip : AppColors.beige;
+    final selectedColor =
+        isDark ? AppColors.darkAccent : AppColors.primaryGreen;
+    final unselectedColor = isDark ? AppColors.darkGrey : AppColors.textGrey;
+    final shadowColor =
+        isDark ? Colors.black.withOpacity(0.4) : Colors.black.withOpacity(0.06);
+
     final items = [
       (Icons.home_rounded, lang.t('home')),
       (Icons.storefront_rounded, lang.t('markets')),
@@ -26,10 +39,14 @@ class DalagBottomNav extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: backgroundColor,
+        border: isDark
+            ? const Border(
+                top: BorderSide(color: AppColors.darkBorder, width: 1))
+            : null,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.06),
+            color: shadowColor,
             blurRadius: 10,
             offset: const Offset(0, -2),
           ),
@@ -50,7 +67,7 @@ class DalagBottomNav extends StatelessWidget {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                 decoration: BoxDecoration(
-                  color: selected ? AppColors.beige : Colors.transparent,
+                  color: selected ? selectedChipColor : Colors.transparent,
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Column(
@@ -58,9 +75,7 @@ class DalagBottomNav extends StatelessWidget {
                   children: [
                     Icon(
                       icon,
-                      color: selected
-                          ? AppColors.primaryGreen
-                          : AppColors.textGrey,
+                      color: selected ? selectedColor : unselectedColor,
                     ),
                     const SizedBox(height: 2),
                     Text(
@@ -69,9 +84,7 @@ class DalagBottomNav extends StatelessWidget {
                         fontSize: 12,
                         fontWeight:
                             selected ? FontWeight.w600 : FontWeight.w400,
-                        color: selected
-                            ? AppColors.primaryGreen
-                            : AppColors.textGrey,
+                        color: selected ? selectedColor : unselectedColor,
                       ),
                     ),
                   ],
