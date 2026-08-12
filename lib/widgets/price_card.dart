@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
 import '../models/price_item.dart';
 import '../providers/language_provider.dart';
 import '../theme/app_theme.dart';
@@ -9,7 +10,8 @@ import 'produce_image.dart';
 class TrendingPriceCard extends StatelessWidget {
   final PriceItem item;
 
-  const TrendingPriceCard({super.key, required this.item});
+  const TrendingPriceCard(
+      {super.key, required this.item, required void Function() onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -19,18 +21,18 @@ class TrendingPriceCard extends StatelessWidget {
     final Color badgeColor = item.isUp
         ? AppColors.negative.withOpacity(0.12)
         : item.isDown
-        ? AppColors.positive.withOpacity(0.12)
-        : Colors.grey.withOpacity(0.15);
+            ? AppColors.positive.withOpacity(0.12)
+            : Colors.grey.withOpacity(0.15);
     final Color badgeTextColor = item.isUp
         ? AppColors.negative
         : item.isDown
-        ? AppColors.positive
-        : AppColors.textGrey;
+            ? AppColors.positive
+            : AppColors.textGrey;
     final IconData badgeIcon = item.isUp
         ? Icons.trending_up
         : item.isDown
-        ? Icons.trending_down
-        : Icons.remove;
+            ? Icons.trending_down
+            : Icons.remove;
 
     return Card(
       child: Padding(

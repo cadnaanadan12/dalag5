@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -7,6 +8,7 @@ import '../providers/city_provider.dart';
 import '../providers/language_provider.dart';
 import '../providers/market_data_provider.dart';
 import '../providers/user_provider.dart';
+import '../services/auth_service.dart';
 import '../theme/app_theme.dart';
 import 'home_screen.dart';
 
@@ -46,7 +48,7 @@ class _LoginScreenState extends State<LoginScreen> {
         context, MaterialPageRoute(builder: (_) => const HomeScreen()));
   }
 
-  void _handleLogin() {
+  Future<void> _handleLogin() async {
     final lang = context.read<LanguageProvider>();
     final username = _usernameController.text.trim();
     final password = _passwordController.text.trim();
@@ -58,14 +60,22 @@ class _LoginScreenState extends State<LoginScreen> {
       return;
     }
 
-    _goHome(UserProfile(
-        username: username,
-        email: '$username@dalag.com',
-        name: username,
-        city: 'Hargeisa'));
+    try {
+      final profile = await AuthService().login(username, password);
+      _goHome(UserProfile(
+        username: profile['username'] ?? username,
+        email: profile['email'] ?? '$username@dalag.com',
+        name: profile['name'] ?? username,
+        city: profile['city'] ?? 'Hargeisa',
+      ));
+    } on FirebaseAuthException catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.message ?? 'Login failed')),
+      );
+    }
   }
 
-  void _handleSignUp() {
+  Future<void> _handleSignUp() async {
     final lang = context.read<LanguageProvider>();
     final username = _usernameController.text.trim();
     final password = _passwordController.text.trim();
@@ -86,8 +96,24 @@ class _LoginScreenState extends State<LoginScreen> {
       return;
     }
 
-    _goHome(UserProfile(
-        username: username, email: email, name: name, city: 'Hargeisa'));
+    try {
+      final profile = await AuthService().register(
+        username: username,
+        password: password,
+        name: name,
+        city: 'Hargeisa',
+      );
+      _goHome(UserProfile(
+        username: profile['username'],
+        email: profile['email'],
+        name: profile['name'],
+        city: profile['city'],
+      ));
+    } on FirebaseAuthException catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.message ?? 'Sign up failed')),
+      );
+    }
   }
 
   @override

@@ -1,3 +1,4 @@
+// lib/screens/home_screen.dart
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -8,6 +9,8 @@ import '../providers/market_data_provider.dart';
 import '../providers/user_provider.dart';
 import '../theme/app_theme.dart';
 import '../widgets/bottom_nav.dart';
+import '../widgets/city_selector_sheet.dart';
+import '../widgets/item_detail_sheet.dart';
 import '../widgets/price_card.dart';
 import 'add_price_screen.dart';
 import 'markets_screen.dart';
@@ -83,22 +86,32 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
         actions: [
-          Container(
-            margin: const EdgeInsets.only(right: 16),
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            decoration: BoxDecoration(
-              color: isDark ? AppColors.darkChip : AppColors.beige,
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.location_city,
-                    size: 16,
-                    color: isDark ? AppColors.darkAccent : AppColors.textDark),
-                const SizedBox(width: 4),
-                Text(currentCity),
-              ],
+          // Taabashadan hadda waxay furaysaa doorashada magaalada.
+          GestureDetector(
+            onTap: () => showCitySelector(context),
+            child: Container(
+              margin: const EdgeInsets.only(right: 16),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: isDark ? AppColors.darkChip : AppColors.beige,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.location_city,
+                      size: 16,
+                      color:
+                          isDark ? AppColors.darkAccent : AppColors.textDark),
+                  const SizedBox(width: 4),
+                  Text(currentCity),
+                  const SizedBox(width: 2),
+                  Icon(Icons.keyboard_arrow_down,
+                      size: 16,
+                      color:
+                          isDark ? AppColors.darkAccent : AppColors.textDark),
+                ],
+              ),
             ),
           ),
         ],
@@ -244,7 +257,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 .map(
                   (item) => Padding(
                     padding: const EdgeInsets.only(bottom: 12),
-                    child: TrendingPriceCard(item: item),
+                    child: TrendingPriceCard(
+                      item: item,
+                      onTap: () => showItemDetailSheet(context, item),
+                    ),
                   ),
                 ),
 
@@ -275,9 +291,10 @@ class _HomeScreenState extends State<HomeScreen> {
                       ],
                     ),
                     const Divider(),
-                    ...allItems
-                        .take(3)
-                        .map((item) => _activityRow(item, lang, somali)),
+                    ...allItems.take(3).map((item) => InkWell(
+                          onTap: () => showItemDetailSheet(context, item),
+                          child: _activityRow(item, lang, somali),
+                        )),
                   ],
                 ),
               ),
@@ -321,4 +338,6 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
+
+  void showItemDetailSheet(BuildContext context, PriceItem item) {}
 }

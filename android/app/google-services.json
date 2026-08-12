@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "104540985559",
+    "project_id": "dalag-app",
+    "storage_bucket": "dalag-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:104540985559:android:39cd986446ce5a5ed27892",
+        "android_client_info": {
+          "package_name": "com.example.dalag5"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD2lZnj_4iyuOj61-laZo3iPx52jk3LGPQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

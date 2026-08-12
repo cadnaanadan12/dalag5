@@ -1,3 +1,4 @@
+// lib/screens/markets_screen.dart
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -12,6 +13,7 @@ import '../widgets/produce_image.dart';
 import 'add_price_screen.dart';
 import 'analysis_chart_screen.dart';
 import 'home_screen.dart';
+import 'produce_detail_screen.dart';
 import 'settings_screen.dart';
 
 class MarketsScreen extends StatefulWidget {
@@ -66,6 +68,13 @@ class _MarketsScreenState extends State<MarketsScreen> {
           .toList();
     }
     return result;
+  }
+
+  void _openDetail(PriceItem item) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => ProduceDetailScreen(item: item)),
+    );
   }
 
   @override
@@ -138,8 +147,6 @@ class _MarketsScreenState extends State<MarketsScreen> {
                 setState(() => _selectedCategory = cat),
           ),
           const SizedBox(height: 16),
-
-          // Search - hadda si dhab ah ayay u shaqaynaysaa
           TextField(
             controller: _searchController,
             onChanged: (value) => setState(() => _query = value),
@@ -158,7 +165,6 @@ class _MarketsScreenState extends State<MarketsScreen> {
             ),
           ),
           const SizedBox(height: 16),
-
           Card(
             child: Padding(
               padding: const EdgeInsets.all(14),
@@ -195,83 +201,88 @@ class _MarketsScreenState extends State<MarketsScreen> {
                       ),
                     )
                   else
-                    ...filteredItems.map((item) => Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 8),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Expanded(
-                                flex: 3,
-                                child: Row(
-                                  children: [
-                                    ProduceImage(
-                                      assetPath: item.imageAsset,
-                                      fallbackIcon: item.fallbackIcon,
-                                      size: 40,
-                                      borderRadius: 10,
-                                    ),
-                                    const SizedBox(width: 8),
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(item.nameEn,
-                                              style: const TextStyle(
-                                                  fontWeight: FontWeight.w600)),
-                                          Text(
-                                            item.name(somali),
-                                            style: TextStyle(
-                                              color: isDark
-                                                  ? AppColors.darkGrey
-                                                  : AppColors.textGrey,
-                                              fontSize: 12,
-                                            ),
-                                          ),
-                                        ],
+                    ...filteredItems.map((item) => InkWell(
+                          onTap: () => _openDetail(item),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 8),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Expanded(
+                                  flex: 3,
+                                  child: Row(
+                                    children: [
+                                      ProduceImage(
+                                        assetPath: item.imageAsset,
+                                        fallbackIcon: item.fallbackIcon,
+                                        size: 40,
+                                        borderRadius: 10,
                                       ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              Expanded(flex: 2, child: Text(item.unit(somali))),
-                              Expanded(
-                                flex: 2,
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                  children: [
-                                    Text(
-                                      item.priceLabel,
-                                      style: TextStyle(
-                                        color: isDark
-                                            ? AppColors.darkPositive
-                                            : AppColors.positive,
-                                        fontWeight: FontWeight.w700,
-                                      ),
-                                    ),
-                                    Text(
-                                      item.changePercent == 0
-                                          ? lang.t('stable')
-                                          : item.changeLabel,
-                                      style: TextStyle(
-                                        fontSize: 11,
-                                        color: item.isUp
-                                            ? (isDark
-                                                ? AppColors.darkNegative
-                                                : AppColors.negative)
-                                            : item.isDown
-                                                ? (isDark
-                                                    ? AppColors.darkPositive
-                                                    : AppColors.positive)
-                                                : (isDark
+                                      const SizedBox(width: 8),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(item.nameEn,
+                                                style: const TextStyle(
+                                                    fontWeight:
+                                                        FontWeight.w600)),
+                                            Text(
+                                              item.name(somali),
+                                              style: TextStyle(
+                                                color: isDark
                                                     ? AppColors.darkGrey
-                                                    : AppColors.textGrey),
+                                                    : AppColors.textGrey,
+                                                fontSize: 12,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
-                              ),
-                            ],
+                                Expanded(
+                                    flex: 2, child: Text(item.unit(somali))),
+                                Expanded(
+                                  flex: 2,
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    children: [
+                                      Text(
+                                        item.priceLabel,
+                                        style: TextStyle(
+                                          color: isDark
+                                              ? AppColors.darkPositive
+                                              : AppColors.positive,
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                      ),
+                                      Text(
+                                        item.changePercent == 0
+                                            ? lang.t('stable')
+                                            : item.changeLabel,
+                                        style: TextStyle(
+                                          fontSize: 11,
+                                          color: item.isUp
+                                              ? (isDark
+                                                  ? AppColors.darkNegative
+                                                  : AppColors.negative)
+                                              : item.isDown
+                                                  ? (isDark
+                                                      ? AppColors.darkPositive
+                                                      : AppColors.positive)
+                                                  : (isDark
+                                                      ? AppColors.darkGrey
+                                                      : AppColors.textGrey),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         )),
                 ],
@@ -279,7 +290,6 @@ class _MarketsScreenState extends State<MarketsScreen> {
             ),
           ),
           const SizedBox(height: 18),
-
           Container(
             padding: const EdgeInsets.all(18),
             decoration: BoxDecoration(
@@ -318,8 +328,6 @@ class _MarketsScreenState extends State<MarketsScreen> {
             ),
           ),
           const SizedBox(height: 18),
-
-          // Price Comparison - hadda way la jaan qaadaan Dark Mode
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(

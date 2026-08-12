@@ -53,6 +53,16 @@ class AppStrings {
       'price': 'Price',
       'change': 'Change',
       'stable': 'Stable',
+      'produce_details': 'Produce Details',
+      'delete': 'Delete',
+      'delete_confirm_title': 'Delete this item?',
+      'delete_confirm_body': 'This action cannot be undone.',
+      'cancel': 'Cancel',
+      'item_deleted': 'Item deleted',
+      'category': 'Category',
+      'high': 'High',
+      'low': 'Low',
+      'weekly_change': '7-Day Change',
 
       // Markets
       'live_market_rates': 'Live Market Rates',
@@ -199,6 +209,16 @@ class AppStrings {
       'price': 'Qiime',
       'change': 'Isbeddel',
       'stable': 'Deggan',
+      'produce_details': 'Faahfaahinta Alaabta',
+      'delete': 'Tirtir',
+      'delete_confirm_title': 'Alaabtan ma tirtirtaa?',
+      'delete_confirm_body': 'Tallaabadan lama celin karo.',
+      'cancel': 'Jooji',
+      'item_deleted': 'Alaabta waa la tirtiray',
+      'category': 'Qaybta',
+      'high': 'Sare',
+      'low': 'Hoose',
+      'weekly_change': 'Isbeddelka 7 Maalmood',
 
       // Markets
       'live_market_rates': 'Qiimaha Suuqa Tooska ah',
